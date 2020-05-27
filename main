@@ -1,0 +1,66 @@
+//Function for getting data from reddish and writing in google sheet
+function getapidata(response,sheetname)
+{
+  var array1 = response.getContentText(); //Store data from redash into this variable
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetname); 
+  var iLen=array1.length;
+  var i = 0;
+  var stringvalue1 = "";
+  var s1 = "";
+  var num1 = 1;
+  var num2 = 1;
+  var temp = sheet.getLastRow();
+  var noheader = 1;
+  for (i=0;i<iLen;i++)
+  {
+    var j=i;
+    do
+    {
+      s1 = array1[j];
+      if(s1==",")
+      {
+        if(noheader==1)
+          noheader = 1; //Skipping Header for 2nd run time of script and above
+        else
+          sheet.getRange(sheet.getLastRow() + num1,num2).setValue(stringvalue1);
+        if(temp==0)
+          sheet.getRange(sheet.getLastRow() + num1,num2).setValue(stringvalue1); //Putting Header for 1st run time of script
+        num1 = 0;
+        num2++;
+        stringvalue1 = "";
+      }
+      else
+        stringvalue1 = stringvalue1 + s1;
+      j++;
+    }while(s1!="\n")
+    if(noheader==1)
+      noheader = 1;
+    else
+      sheet.getRange(sheet.getLastRow() + num1,num2).setValue(stringvalue1);
+    if(temp==0)
+      sheet.getRange(sheet.getLastRow() + num1,num2).setValue(stringvalue1);
+    ++noheader;
+    ++temp;
+    num1 = 1;
+    num2 = 1;
+    stringvalue1 = "";
+    i=j-1;
+  }
+}
+function getdatafromredash() 
+{
+  //CHANGE API VALUES BELOW FOR YOUR QUERIES
+  var redashdata = "https://redash.<your organization name>.com/api/queries/<query id>/results.csv?api_key=<your redash API Key>”; //For Alarm 
+  var sheetname = “<google sheet name where you want to write reddish data>”;
+  var response = UrlFetchApp.fetch(redashdata, {muteHttpExceptions: true }); //Storing Tag Filtering Query result in this variable.
+  Logger.log(response.getContentText()); //If any error, error to be logged
+  getapidata(response,sheetname); //Call function for writing data in google sheets
+}
+//This function is used to create customised menu in google sheets
+function onOpen() 
+{
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('Connect with Redash')
+      .addItem('Get Data from Redash','getdatafromredash') 
+      .addToUi();
+}
