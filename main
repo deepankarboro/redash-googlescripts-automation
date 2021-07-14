@@ -51,7 +51,7 @@ function getdatafromredash()
 {
   //CHANGE API VALUES BELOW FOR YOUR QUERIES
   var redashdata = "https://redash.<your organization name>.com/api/queries/<query id>/results.csv?api_key=<your redash API Key>”; //For Alarm 
-  var sheetname = “<google sheet name where you want to write reddish data>”;
+  var sheetname = “<google sheet name where you want to write reddash data>”;
   var response = UrlFetchApp.fetch(redashdata, {muteHttpExceptions: true }); //Storing Tag Filtering Query result in this variable.
   Logger.log(response.getContentText()); //If any error, error to be logged
   getapidata(response,sheetname); //Call function for writing data in google sheets
